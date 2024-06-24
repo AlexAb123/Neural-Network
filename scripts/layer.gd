@@ -94,7 +94,6 @@ func update_gradients():
 		bias_gradients[node_out] += deltas[node_out]
 		
 func apply_gradients(learn_rate: float, batch_size: int, momentum: float):
-	
 	for node_out in output_count:
 		for node_in in input_count:
 			var step = (learn_rate * weight_gradients[node_out][node_in] + momentum * prev_weight_gradients[node_out][node_in]) / batch_size

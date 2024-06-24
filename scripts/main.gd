@@ -17,7 +17,7 @@ var label_batches
 
 var net: NeuralNetwork
 
-var hidden_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.RELU)
+var hidden_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.SIGMOID)
 var output_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.SOFTMAX)
 var cost = CostFactory.new_cost(CostFactory.type.CROSS_ENTROPY)
 
@@ -37,10 +37,10 @@ func _ready():
 			else:
 				labels.append([0,1])
 	shuffle_data(data, labels)
-	net = NeuralNetwork.new(2, 2, 0, 0, hidden_layer_activation, output_layer_activation, cost)
+	net = NeuralNetwork.new(2, 2, 3, 1, hidden_layer_activation, output_layer_activation, cost)
 	update_boxes()
-	data_batches = create_mini_batches(data, 75)
-	label_batches = create_mini_batches(labels, 75)
+	data_batches = create_mini_batches(data, 50)
+	label_batches = create_mini_batches(labels, 50)
 func update_boxes():
 	for x in range(100):
 		for y in range(100):
@@ -110,7 +110,7 @@ func _process(delta):
 	if start:
 		frame += 1
 		for i in data_batches.size():
-			net.train(data_batches[i], label_batches[i], 0.7, 10, 0.8)
+			net.train(data_batches[i], label_batches[i], 0.5, 10, 0)
 			net.save_to_file("res://saves/neural_network_save.json")
 			update_boxes()
 		if frame == 1:
