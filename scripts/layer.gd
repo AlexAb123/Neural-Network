@@ -93,11 +93,13 @@ func apply_gradients(learn_rate: float, batch_size: int, momentum: float):
 	
 	for node_out in output_count:
 		for node_in in input_count:
-			weights[node_out][node_in] -= (learn_rate * weight_gradients[node_out][node_in] + momentum * prev_weight_gradients[node_out][node_in]) / batch_size
+			var step = (learn_rate * weight_gradients[node_out][node_in] + momentum * prev_weight_gradients[node_out][node_in]) / batch_size
+			weights[node_out][node_in] -= step
 			prev_weight_gradients[node_out][node_in] = weight_gradients[node_out][node_in]
 			
 	for node_out in output_count:
-		biases[node_out] -= (learn_rate * bias_gradients[node_out] + momentum * prev_bias_gradients[node_out]) / batch_size
+		var step = (learn_rate * bias_gradients[node_out] + momentum * prev_bias_gradients[node_out]) / batch_size
+		biases[node_out] -= step
 		prev_bias_gradients[node_out] = bias_gradients[node_out]
 	
 	reset_gradients()
