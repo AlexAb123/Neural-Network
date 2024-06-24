@@ -12,15 +12,14 @@ var dots: Array[Array] = []
 var data = []
 var labels = []
 
-
 var data_batches
 var label_batches
 
 var net: NeuralNetwork
 
 var hidden_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.RELU)
-var output_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.SIGMOID)
-var cost = CostFactory.new_cost(CostFactory.type.MEAN_SQUARED_ERROR)
+var output_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.SOFTMAX)
+var cost = CostFactory.new_cost(CostFactory.type.CROSS_ENTROPY)
 
 var boxes: Array[Array] = []
 
@@ -45,7 +44,7 @@ func _ready():
 func update_boxes():
 	for x in range(100):
 		for y in range(100):
-			var output = net.forward_propagate([x,y])
+			var output = net.forward_propagate([x/100.0,y/100.0])
 			if output[0] > output[1]:
 				boxes[x][y].texture = RED_BOX
 			else:
@@ -104,34 +103,10 @@ func _on_train_button_pressed():
 	start = not start
 	for i in 5:
 		print(net.forward_propagate(data[i]))
+		print(data[i])
 		print(labels[i])
 		print()
-	#return
-	##print(net)
-	#for i in 1000:
-		##await get_tree().process_frame
-#
-		#data_index += 1
-		#if data_index == data_batches.size():
-			#data_index = 0
-		#print(net)
-		#
-		#print("Data:")
-		#print(data[data_index])
-		#print(labels[data_index])
-		#print("Prediction:")
-		#print(net.forward_propagate(data[data_index]))
-		#for layer in net.layers:
-			#for w in layer.weights:
-				#for weight in w:
-					#if weight == 0:
-						#print("000000000")
-	##net.train([data[data_index]], [labels[data_index]], 0.1)
-	##update_boxes()
-	##print(net)
-	##print("-----------------------------------------------------")
-	##print("-----------------------------------------------------")
-	##print("-----------------------------------------------------")
+
 var frame = 0
 var data_index = 0
 

@@ -68,12 +68,12 @@ func calculate_output(data_point: Array):
 	return outputs
 	
 func calculate_output_layer_deltas(label: Array, cost: Cost):
-	if activation.get_type() == "SOFTMAX" and cost.get_type() == "CROSS_ENTROPY":
-		for node_out in output_count:
-			deltas[node_out] = outputs[node_out] - label[node_out]
-	else:
-		for node_out in output_count:
-			deltas[node_out] = activation.derivative(weighted_sums, node_out) * cost.derivative(outputs[node_out], label[node_out])
+	# Don't need this because of the mathematical shenanigans going on with the Cross Entropy Derivative (still don't understand it)
+	#if activation.get_type() == "SOFTMAX" and cost.get_type() == "CROSS_ENTROPY":
+		#for node_out in output_count:
+			#deltas[node_out] = outputs[node_out] - label[node_out]
+	for node_out in output_count:
+		deltas[node_out] = activation.derivative(weighted_sums, node_out) * cost.derivative(outputs[node_out], label[node_out])
 		
 func calculate_hidden_layer_deltas(next_layer: Layer):
 	for i in deltas.size():
