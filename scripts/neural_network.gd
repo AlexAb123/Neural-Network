@@ -26,16 +26,16 @@ func forward_propagate(data_point: Array):
 		output = layer.calculate_output(output)
 	return output
 	
-func back_propagate(label: Array):
+func back_propagate(label: Array, gradient_clamp: float):
 	layers[layers.size() - 1].calculate_output_layer_deltas(label, cost)
 	for i in range(layers.size() - 2, -1, -1):
 		layers[i].calculate_hidden_layer_deltas(layers[i+1])
-	update_all_gradients()
+	update_all_gradients(gradient_clamp)
 	
-func update_all_gradients():
+func update_all_gradients(gradient_clamp: float):
 	# Accumulate gradients for each layer
 	for layer in layers:
-		layer.update_gradients()
+		layer.update_gradients(gradient_clamp)
 
 func apply_all_gradients(learn_rate: float, batch_size: int):
 	for layer in layers:
@@ -45,13 +45,14 @@ func reset_all_gradients():
 	for layer in layers:
 		layer.reset_gradients()
 		
-func train(data: Array, labels: Array, learn_rate: float, epochs: int):
+func train(data: Array, labels: Array, learn_rate: float, epochs: int, gradient_clamp):
 	for epoch in epochs:
 		for i in data.size():
 			var data_point = data[i]
 			var label = labels[i]
 			forward_propagate(data_point)
-			back_propagate(label)
+			back_propagate(label, gradient_clamp)
+		print(self)
 		apply_all_gradients(learn_rate, data.size())
 		reset_all_gradients()
 

@@ -55,9 +55,13 @@ func calculate_output(data_point: Array):
 	return outputs
 	
 func calculate_output_layer_deltas(label: Array, cost: Cost):
-	for node_out in output_count:
-		deltas[node_out] = activation.derivative(weighted_sums, node_out) * cost.derivative(outputs[node_out], label[node_out])
-
+	if activation.get_type() == "SOFTMAX" and cost.get_type() == "CROSS_ENTROPY":
+		for node_out in output_count:
+			deltas[node_out] = outputs[node_out] - label[node_out]
+	else:
+		for node_out in output_count:
+			deltas[node_out] = activation.derivative(weighted_sums, node_out) * cost.derivative(outputs[node_out], label[node_out])
+		
 func calculate_hidden_layer_deltas(next_layer: Layer):
 	for i in deltas.size():
 		deltas[i] = 0.0
@@ -67,14 +71,14 @@ func calculate_hidden_layer_deltas(next_layer: Layer):
 	for i in output_count:
 		deltas[i] *= activation.derivative(weighted_sums, i)
 		
-func update_gradients():
+func update_gradients(gradient_clamp: float):
 	for node_out in output_count:
 		for node_in in input_count:
 			# Acculumate because we will reset it when we apply it (which will be after every batch, which we take the average with respect to)
-			weight_gradients[node_out][node_in] += deltas[node_out] * weights[node_out][node_in]
+			weight_gradients[node_out][node_in] += clamp(deltas[node_out] * weights[node_out][node_in], -gradient_clamp, gradient_clamp)
 			
 	for node_out in output_count:
-		bias_gradients[node_out] += deltas[node_out]
+		bias_gradients[node_out] += clamp(deltas[node_out], -gradient_clamp, gradient_clamp)
 		
 func apply_gradients(learn_rate: float, batch_size: int):
 	

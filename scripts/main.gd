@@ -94,9 +94,10 @@ func shuffle_data(image_data: Array, label_data: Array):
 		
 var data_index = 0
 func _on_train_button_pressed():
-	for i in range(25):
+	print(net)
+	for i in range(250):
 		#await get_tree().process_frame
-		net.train(data_batches[data_index], label_batches[data_index], 0.05, 100)
+		net.train(data_batches[data_index], label_batches[data_index], 0.001, 1, 0)
 		update_boxes()
 		data_index += 1
 		if data_index == data_batches.size():
