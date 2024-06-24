@@ -9,6 +9,7 @@ var output_count: int
 var weights: Array[Array]
 var biases: Array
 
+var inputs: Array
 var weighted_sums: Array
 var activation: Activation
 var outputs: Array
@@ -49,8 +50,11 @@ func _init(_input_count = 0, _output_count = 0, _activation = null):
 		weights.append(temp_weights)
 		weight_gradients.append(temp_weight_gradients)
 		prev_weight_gradients.append(temp_prev_weight_gradients)
+	for i in input_count:
+		inputs.append(0.0)
 		
 func calculate_weighted_sums(data_point: Array):
+	inputs = data_point
 	for node_out in output_count:
 		var sum = biases[node_out]
 		for node_in in input_count:
@@ -84,7 +88,7 @@ func update_gradients():
 	for node_out in output_count:
 		for node_in in input_count:
 			# Acculumate because we will reset it when we apply it (which will be after every batch, which we take the average with respect to)
-			weight_gradients[node_out][node_in] += deltas[node_out] * weights[node_out][node_in]
+			weight_gradients[node_out][node_in] += deltas[node_out] * inputs[node_in]
 			
 	for node_out in output_count:
 		bias_gradients[node_out] += deltas[node_out]
