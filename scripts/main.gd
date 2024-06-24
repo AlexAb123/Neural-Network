@@ -110,7 +110,7 @@ func _process(delta):
 	if start:
 		frame += 1
 		for i in data_batches.size():
-			net.train(data_batches[i], label_batches[i], 0.5, 10, 0)
+			net.train(data_batches[i], label_batches[i], 0.5, 10, 0.8)
 			net.save_to_file("res://saves/neural_network_save.json")
 			update_boxes()
 		if frame == 1:
