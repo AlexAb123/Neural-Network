@@ -105,19 +105,6 @@ func _on_train_button_pressed():
 var frame = 0
 var data_index = 0
 
-#var data = [[1,1], [1,0], [0,1], [0,0]]
-#var labels = [[0], [1], [1], [0]]
-
-#func _ready():
-	#net = NeuralNetwork.new(2, 1, 0, 0, hidden_layer_activation, output_layer_activation, cost)
-	#print(net)
-	#print("Total Cost:")
-	#print(net.calculate_average_cost(data, labels))
-	#for i in data.size():
-		#print(net.forward_propagate(data[i]))
-		#print(labels[i])
-		#print()
-
 func _process(delta):
 	
 	if start:
@@ -130,4 +117,3 @@ func _process(delta):
 			print("Total Cost:")
 			print(net.calculate_average_cost(data, labels))
 			frame = 0
-
