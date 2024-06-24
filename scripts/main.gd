@@ -9,8 +9,8 @@ const RED_BOX = preload("res://sprites/Red_Box.png")
 var dots: Array[Array] = []
 
 # Red is [1,0] Blue is [0,1]
-#var data = []
-#var labels = []
+var data = []
+var labels = []
 
 
 var data_batches
@@ -19,26 +19,26 @@ var label_batches
 var net: NeuralNetwork
 
 var hidden_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.RELU)
-var output_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.SOFTMAX)
-var cost = CostFactory.new_cost(CostFactory.type.CROSS_ENTROPY)
+var output_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.SIGMOID)
+var cost = CostFactory.new_cost(CostFactory.type.MEAN_SQUARED_ERROR)
 
 var boxes: Array[Array] = []
 
-#func _ready():
-	##initialize_grid()
-	##for x in range(100):
-		##if x < 30 or x > 70:
-			##continue
-		##for y in range(100):
-			##if y > 30 and y < 70:
-				##continue
-			##data.append([x/100.0,y/100.0])
-			##if y < 50:
-				##labels.append([1,0])
-			##else:
-				##labels.append([0,1])
-	#shuffle_data(data, labels)
-	#net = NeuralNetwork.new(2, 1, 0, 0, hidden_layer_activation, output_layer_activation, cost)
+func _ready():
+	#initialize_grid()
+	for x in range(100):
+		if x < 30 or x > 70:
+			continue
+		for y in range(100):
+			if y > 30 and y < 70:
+				continue
+			data.append([x/100.0,y/100.0])
+			if y < 50:
+				labels.append([1,0])
+			else:
+				labels.append([0,1])
+	shuffle_data(data, labels)
+	net = NeuralNetwork.new(2, 1, 0, 0, hidden_layer_activation, output_layer_activation, cost)
 	###net = NeuralNetwork.load_from_file("res://saves/neural_network_save.json")
 	##update_boxes()
 	##data_batches = create_mini_batches(data, 75)
@@ -134,12 +134,18 @@ func _on_train_button_pressed():
 var frame = 0
 var data_index = 0
 
-var data = [[1,1], [1,0], [0,1], [0,0]]
-var labels = [[0], [1], [1], [0]]
+#var data = [[1,1], [1,0], [0,1], [0,0]]
+#var labels = [[0], [1], [1], [0]]
 
-func _ready():
-	net = NeuralNetwork.new(2, 1, 3, 3, hidden_layer_activation, output_layer_activation, cost)
-	print(net)
+#func _ready():
+	#net = NeuralNetwork.new(2, 1, 0, 0, hidden_layer_activation, output_layer_activation, cost)
+	#print(net)
+	#print("Total Cost:")
+	#print(net.calculate_average_cost(data, labels))
+	#for i in data.size():
+		#print(net.forward_propagate(data[i]))
+		#print(labels[i])
+		#print()
 
 func _process(delta):
 	
@@ -147,8 +153,8 @@ func _process(delta):
 		frame += 1
 		net.train(data, labels, 0.5, 100, 1)
 		net.save_to_file("res://saves/neural_network_save.json")
-		if frame == 10:
-			print(net)
+		if frame == 1:
+			#print(net)
 			print("Total Cost:")
 			print(net.calculate_average_cost(data, labels))
 			frame = 0
