@@ -101,11 +101,6 @@ func shuffle_data(image_data: Array, label_data: Array):
 var start = false
 func _on_train_button_pressed():
 	start = not start
-	for i in 5:
-		print(net.forward_propagate(data[i]))
-		print(data[i])
-		print(labels[i])
-		print()
 
 var frame = 0
 var data_index = 0
@@ -130,9 +125,9 @@ func _process(delta):
 		for i in data_batches.size():
 			net.train(data_batches[i], label_batches[i], 0.7, 10, 0.8)
 			net.save_to_file("res://saves/neural_network_save.json")
+			update_boxes()
 		if frame == 1:
 			print("Total Cost:")
 			print(net.calculate_average_cost(data, labels))
 			frame = 0
-			update_boxes()
 
