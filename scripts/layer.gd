@@ -22,8 +22,6 @@ var bias_gradients: Array
 var prev_weight_gradients: Array[Array]
 var prev_bias_gradients: Array
 
-func rr(min: float, max: float) -> float:
-	return min + (max - min) * randi() / pow(2,32)
 func _init(_input_count = 0, _output_count = 0, _activation = null):
 	input_count = _input_count
 	output_count = _output_count
@@ -43,8 +41,7 @@ func _init(_input_count = 0, _output_count = 0, _activation = null):
 		weighted_sums.append(0.0)
 		outputs.append(0.0)
 		for j in input_count:
-			var r = rr(-1,1)
-			temp_weights.append(r)
+			temp_weights.append(randf())
 			temp_weight_gradients.append(0.0)
 			temp_prev_weight_gradients.append(0.0)
 		weights.append(temp_weights)

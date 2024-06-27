@@ -33,8 +33,8 @@ var cost = CostFactory.new_cost(CostFactory.type.CROSS_ENTROPY)
 var net: NeuralNetwork
 func _ready():
 	
-	image_data = load_images(images_file_path, 2500)
-	label_data = load_labels(labels_file_path, 2500)
+	image_data = load_images(images_file_path, 30000)
+	label_data = load_labels(labels_file_path, 30000)
 	
 	training_image_data = image_data.slice(0, snapped(training_split*image_data.size(), batch_size))
 	testing_image_data = image_data.slice(training_image_data.size(), image_data.size())
@@ -58,7 +58,6 @@ func _process(delta):
 	
 var batch_index = 0
 func train_one_batch():
-	return
 	net.train(image_batches[batch_index], label_batches[batch_index], learn_rate, epochs, momentum)
 	print("Total Cost: " + str(net.calculate_average_cost(image_data, label_data)))
 	batch_index += 1
@@ -70,10 +69,10 @@ func train_one_batch():
 const SPRITE_0001 = preload("res://sprites/Sprite-0001.png")
 var test_index = 0
 func _on_next_button_pressed():
-	var d = convert_texture_to_data(SPRITE_0001)
-	set_texture_on_rect(d)
-	update_prediction_label(net.forward_propagate(d))
-	return
+	#var d = convert_texture_to_data(SPRITE_0001)
+	#set_texture_on_rect(d)
+	#update_prediction_label(net.forward_propagate(d))
+	#return
 	set_texture_on_rect(image_data[test_index])
 	update_prediction_label(net.forward_propagate(image_data[test_index]))
 	test_index += 1
