@@ -122,6 +122,7 @@ func _on_next_button_pressed():
 		
 	else:
 		texture_rect.texture = (await apply_noise(image_data[0]))
+		print(convert_texture_to_data(texture_rect.texture))
 		#texture_rect.texture = convert_data_to_texture(convert_texture_to_data(texture_rect.texture))
 		#set_texture_on_rect(r)
 	test_index += 1
