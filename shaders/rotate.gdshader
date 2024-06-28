@@ -4,7 +4,7 @@ void vertex() {
 	// Called for every vertex the material is visible on.
 }
 
-uniform float angle = 360.0;
+uniform float angle = 0.0;
 
 void fragment() {
 	// Called for every pixel the material is visible on.

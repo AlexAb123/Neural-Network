@@ -176,6 +176,7 @@ func convert_data_to_texture(pixel_data: Array):
 	
 func rotate_texture(texture: Texture2D):
 	input_sprite.texture = texture
+	input_sprite.material.set_shader_parameter("angle", randf_range(-45.0, 45.0))
 	RenderingServer.frame_post_draw
 	return sub_viewport.get_texture()
 
