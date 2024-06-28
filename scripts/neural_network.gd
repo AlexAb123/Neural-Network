@@ -6,19 +6,13 @@ var layers: Array[Layer] = []
 
 var cost: Cost
 
-func _init(input_layer_size = 0, output_layer_size = 0, hidden_layer_size = 0, hidden_layer_count = 0, hidden_layer_activation = null, output_layer_activation = null, _cost = null):
+func _init(layer_sizes: Array = [], hidden_layer_activation = null, output_layer_activation = null, _cost = null):
 	
 	cost = _cost
-	
-	# Create hidden and output layers
-	for i in hidden_layer_count + 1:
-		var input_count = hidden_layer_size if i != 0 else input_layer_size
-		if i == hidden_layer_count:
-			# Output layer
-			layers.append(Layer.new(input_count, output_layer_size, output_layer_activation))
-		else:
-			# Hidden layer
-			layers.append(Layer.new(input_count, hidden_layer_size, hidden_layer_activation))
+
+	for i in range(1, layer_sizes.size()):
+		var a = hidden_layer_activation if i < layer_sizes.size() - 1 else output_layer_activation
+		layers.append(Layer.new(layer_sizes[i-1], layer_sizes[i], a))
 
 func forward_propagate(data_point: Array):
 	var output: Array = data_point
@@ -41,14 +35,13 @@ func apply_all_gradients(learn_rate: float, batch_size: int, momentum: float):
 	for layer in layers:
 		layer.apply_gradients(learn_rate, batch_size, momentum)
 
-func train(data: Array, labels: Array, learn_rate: float, epochs: int, momentum: float):
-	for epoch in epochs:
-		for i in data.size():
-			var data_point = data[i]
-			var label = labels[i]
-			forward_propagate(data_point)
-			back_propagate(label)
-		apply_all_gradients(learn_rate, data.size(), momentum)
+func train(data: Array, labels: Array, learn_rate: float, momentum: float):
+	for i in data.size():
+		var data_point = data[i]
+		var label = labels[i]
+		forward_propagate(data_point)
+		back_propagate(label)
+	apply_all_gradients(learn_rate, data.size(), momentum)
 
 func calculate_average_cost(data: Array, labels: Array):
 	var total_cost = 0.0
@@ -96,3 +89,5 @@ func _to_string():
 	for i in layers.size():
 		string += "Layer " + str(i) + ":\n" + str(layers[i]) + "\n----------------------------------------------\n"
 	return string
+
+

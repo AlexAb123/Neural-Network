@@ -14,6 +14,33 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="VBoxContainer2" type="VBoxContainer" parent="CanvasLayer/HBoxContainer"]
+layout_mode = 2
+
+[node name="New Network" type="Button" parent="CanvasLayer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+text = "New Network"
+
+[node name="SaveButton" type="Button" parent="CanvasLayer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+text = "Save"
+
+[node name="LoadButton" type="Button" parent="CanvasLayer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+text = "Load"
+
+[node name="TrainingAccuracyLabel" type="Label" parent="CanvasLayer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+text = "Training: N/A"
+
+[node name="TestingAccuracyLabel" type="Label" parent="CanvasLayer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+text = "Testing: N/A"
+
+[node name="EpochCompletionLabel" type="Label" parent="CanvasLayer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+text = "Epoch: N/A"
+
 [node name="NextButton" type="Button" parent="CanvasLayer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
@@ -22,7 +49,7 @@ text = "Next"
 
 [node name="TrainButton" type="Button" parent="CanvasLayer/HBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 2
+size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "Train
 "
@@ -41,6 +68,9 @@ layout_mode = 2
 size_flags_vertical = 3
 bbcode_enabled = true
 
+[connection signal="pressed" from="CanvasLayer/HBoxContainer/VBoxContainer2/New Network" to="." method="_on_new_network_pressed"]
+[connection signal="pressed" from="CanvasLayer/HBoxContainer/VBoxContainer2/SaveButton" to="." method="save_network"]
+[connection signal="pressed" from="CanvasLayer/HBoxContainer/VBoxContainer2/LoadButton" to="." method="load_network"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/NextButton" to="." method="_on_next_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/NextButton" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/TrainButton" to="." method="_on_train_button_pressed"]

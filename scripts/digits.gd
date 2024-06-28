@@ -1,8 +1,14 @@
+class_name Digits
+
 extends Node2D
 
 
 @onready var texture_rect = $CanvasLayer/HBoxContainer/TextureRect
 @onready var prediction_label = $CanvasLayer/HBoxContainer/VBoxContainer/PredictionLabel
+
+@onready var training_accuracy_label = $CanvasLayer/HBoxContainer/VBoxContainer2/TrainingAccuracyLabel
+@onready var testing_accuracy_label = $CanvasLayer/HBoxContainer/VBoxContainer2/TestingAccuracyLabel
+@onready var epoch_completion_label = $CanvasLayer/HBoxContainer/VBoxContainer2/EpochCompletionLabel
 
 var images_file_path = "res://data/train-images.idx3-ubyte"
 var labels_file_path = "res://data/train-labels.idx1-ubyte"
@@ -21,20 +27,23 @@ var testing_label_data
 
 var image_index = 0
 
-var batch_size: int = 100
+var batch_size: int = 1000
 var learn_rate: float = 0.5
 var epochs: int = 5
-var training_split: float = 1
+var training_split: float = 0.8
 var momentum: int = 0.8
 var hidden_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.SIGMOID)
 var output_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.SOFTMAX)
 var cost = CostFactory.new_cost(CostFactory.type.CROSS_ENTROPY)
 
 var net: NeuralNetwork
+
+var training_thread: Thread
+
 func _ready():
 	
-	image_data = load_images(images_file_path, 30000)
-	label_data = load_labels(labels_file_path, 30000)
+	image_data = load_images(images_file_path)
+	label_data = load_labels(labels_file_path)
 	
 	training_image_data = image_data.slice(0, snapped(training_split*image_data.size(), batch_size))
 	testing_image_data = image_data.slice(training_image_data.size(), image_data.size())
@@ -46,25 +55,59 @@ func _ready():
 	image_batches = create_mini_batches(training_image_data, batch_size)
 	label_batches = create_mini_batches(training_label_data, batch_size)
 	
-	#net = NeuralNetwork.new(784, 10, 16, 2, hidden_layer_activation, output_layer_activation, cost)
-	net = NeuralNetwork.load_from_file("res://saves/neural_network_save.json")
-var start = false
-func _on_train_button_pressed():
-	start = not start
-
-func _process(delta):
-	while start:
-		train_one_batch()
+	net = NeuralNetwork.new([784, 16, 16, 10], hidden_layer_activation, output_layer_activation, cost)
+	#net = NeuralNetwork.load_from_file("res://saves/neural_network_save.json")
 	
-var batch_index = 0
-func train_one_batch():
-	net.train(image_batches[batch_index], label_batches[batch_index], learn_rate, epochs, momentum)
-	print("Total Cost: " + str(net.calculate_average_cost(image_data, label_data)))
-	batch_index += 1
-	if batch_index == image_batches.size():
-		batch_index = 0
-	net.save_to_file("res://saves/neural_network_save.json")
+func _on_train_button_pressed():
+	start_training()
 
+
+#func _process(delta):
+	#while start:
+		#train_one_batch()
+		#
+
+func start_training():
+	for epoch in epochs:
+		for i in image_batches.size():
+			var start_time = Time.get_ticks_msec()
+			net.train(image_batches[i], label_batches[i], learn_rate, momentum)
+			var end_time = Time.get_ticks_msec()
+			var elapsed_time = end_time - start_time
+			print("Time taken: %d ms" % elapsed_time)
+			#await get_tree().process_frame
+			#update_statistics(float(i+1)/image_batches.size())
+
+func update_statistics(epoch_completion: float):
+	epoch_completion_label.text = "Epoch: " + str(snapped(epoch_completion*100, 0.1)) + "%"
+	
+	var testing_correct := 0
+	var training_correct := 0
+	for i in testing_image_data.size():
+		testing_correct += 1 if is_prediction_correct(net.forward_propagate(testing_image_data[i]), testing_label_data[i]) else 0
+	#for i in training_image_data.size():
+		#training_correct += 1 if is_prediction_correct(net.forward_propagate(training_image_data[i]), training_label_data[i]) else 0
+	#training_accuracy_label.text = "Training: " + str(snapped(float(training_correct)/training_image_data.size()*100, 0.1)) + "%"
+	testing_accuracy_label.text = "Testing: " + str(snapped(float(testing_correct)/testing_image_data.size()*100, 0.1)) + "%"
+	#print("Total Cost: " + str(net.calculate_average_cost(image_data, label_data)))
+	
+	
+func is_prediction_correct(prediction, expected_outputs):
+	var max_index = 0
+	var max = prediction[0]
+	for i in range(1, prediction.size(), 1):
+		if prediction[i] > max:
+			max = prediction[i]
+			max_index = i
+	return expected_outputs[max_index] == 1
+
+func save_network():
+	net.save_to_file("res://saves/neural_network_save.json")
+	print("Saved")
+
+func load_network():
+	net.load_from_file("res://saves/neural_network_save.json")
+	print("Loaded")
 
 const SPRITE_0001 = preload("res://sprites/Sprite-0001.png")
 var test_index = 0
@@ -82,22 +125,17 @@ func _on_next_button_pressed():
 func set_texture_on_rect(data_point: Array):
 	texture_rect.texture = create_texture_from_data(data_point, 28, 28)
 	
-
 func shuffle_data(image_data: Array, label_data: Array):
 	
 	var size = image_data.size()
 	for i in size:
-		
 		var j = randi() % size
-		
 		var temp_image = image_data[i]
 		image_data[i] = image_data[j]
 		image_data[j] = temp_image
-		
 		var temp_label = label_data[i]
 		label_data[i] = label_data[j]
 		label_data[j] = temp_label
-		
 	
 func create_mini_batches(data: Array, batch_size: int):
 	var batches = []
@@ -194,3 +232,7 @@ func load_labels(labels_file_path, label_count = -1):
 	return new_labels
 
 
+
+
+func _on_new_network_pressed():
+	net = NeuralNetwork.new()
