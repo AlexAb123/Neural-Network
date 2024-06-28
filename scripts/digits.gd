@@ -2,6 +2,8 @@ class_name Digits
 
 extends Node2D
 
+@onready var sub_viewport = $SubViewport
+@onready var input_sprite = $SubViewport/InputSprite
 
 @onready var texture_rect = $CanvasLayer/HBoxContainer/TextureRect
 @onready var prediction_label = $CanvasLayer/HBoxContainer/VBoxContainer/PredictionLabel
@@ -42,8 +44,8 @@ var training_thread: Thread
 
 func _ready():
 	
-	image_data = load_images(images_file_path)
-	label_data = load_labels(labels_file_path)
+	image_data = load_images(images_file_path, 1000)
+	label_data = load_labels(labels_file_path, 1000)
 	
 	training_image_data = image_data.slice(0, snapped(training_split*image_data.size(), batch_size))
 	testing_image_data = image_data.slice(training_image_data.size(), image_data.size())
@@ -116,14 +118,23 @@ func _on_next_button_pressed():
 	#set_texture_on_rect(d)
 	#update_prediction_label(net.forward_propagate(d))
 	#return
-	set_texture_on_rect(image_data[test_index])
-	update_prediction_label(net.forward_propagate(image_data[test_index]))
+	#set_texture_on_rect(image_data[test_index])
+	#update_prediction_label(net.forward_propagate(image_data[test_index]))
+	if test_index == 0:
+		set_texture_on_rect(image_data[0])
+		print(texture_rect.texture.get_size())
+		
+	else:
+		print(convert_data_to_texture(image_data[0]).get_size())
+		texture_rect.texture = rotate_texture(convert_data_to_texture(image_data[0]))
+		print(texture_rect.texture.get_size())
+		#set_texture_on_rect(r)
 	test_index += 1
 	if test_index == image_data.size():
 		test_index = 0
 
 func set_texture_on_rect(data_point: Array):
-	texture_rect.texture = create_texture_from_data(data_point, 28, 28)
+	texture_rect.texture = convert_data_to_texture(data_point)
 	
 func shuffle_data(image_data: Array, label_data: Array):
 	
@@ -151,17 +162,22 @@ func convert_texture_to_data(texture: Texture2D):
 			data.append(image.get_pixel(x, y).get_luminance())
 	return data
 
-func create_texture_from_data(pixel_data: Array, width: int, height: int):
-
+func convert_data_to_texture(pixel_data: Array):
+	var width = 28
+	var height = 28
 	var image = Image.create(width, height, false, Image.FORMAT_L8)
 	for y in height:
 		for x in width:
 			var v = pixel_data[y * width + x]
-			image.set_pixel(x, y, Color(v,v,v))
+			image.set_pixel(x, y, Color(v, v, v))
 	var texture = ImageTexture.new()
 	texture.set_image(image)
 	return texture
-
+	
+func rotate_texture(texture: Texture2D):
+	input_sprite.texture = texture
+	RenderingServer.frame_post_draw
+	return sub_viewport.get_texture()
 
 func update_prediction_label(predicted_outputs: Array):
 	prediction_label.clear()

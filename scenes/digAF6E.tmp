@@ -75,13 +75,10 @@ size_flags_vertical = 3
 bbcode_enabled = true
 
 [node name="SubViewport" type="SubViewport" parent="."]
-canvas_item_default_texture_filter = 0
-size = Vector2i(28, 28)
 
 [node name="InputSprite" type="Sprite2D" parent="SubViewport"]
 material = SubResource("ShaderMaterial_8peky")
 texture = ExtResource("3_78yw0")
-centered = false
 
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/VBoxContainer2/New Network" to="." method="_on_new_network_pressed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/VBoxContainer2/SaveButton" to="." method="save_network"]
