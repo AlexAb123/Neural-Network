@@ -42,6 +42,8 @@ var noise_strength: float = 0.0
 
 var net: NeuralNetwork
 
+var layers: Array = [784, 16, 16, 10]
+
 var training_thread: Thread
 
 func _ready():
@@ -62,12 +64,14 @@ func _ready():
 	image_batches = create_mini_batches(training_image_data, batch_size)
 	label_batches = create_mini_batches(training_label_data, batch_size)
 	
-	net = NeuralNetwork.new([784, 16, 16, 10], hidden_layer_activation, output_layer_activation, cost)
+	net = NeuralNetwork.new(layers, hidden_layer_activation, output_layer_activation, cost)
 	#net = NeuralNetwork.load_from_file("res://saves/neural_network_save.json")
 	
 	print("Initialization Complete")
 	
 func _on_train_button_pressed():
+	if net == null:
+		return
 	start_training()
 
 func start_training():
@@ -105,17 +109,20 @@ func is_prediction_correct(prediction, expected_outputs):
 	return expected_outputs[max_index] == 1
 
 func save_network():
+	if net == null:
+		return
 	net.save_to_file("res://saves/neural_network_save.json")
 	print("Saved")
 
 func load_network():
-	net.load_from_file("res://saves/neural_network_save.json")
+	net = NeuralNetwork.load_from_file("res://saves/neural_network_save.json")
 	print("Loaded")
 
 const SPRITE_0001 = preload("res://sprites/Sprite-0001.png")
 var test_index = 0
 func _on_next_button_pressed():
-
+	if net == null:
+		return
 	set_texture_on_rect(image_data[test_index])
 	update_prediction_label(net.forward_propagate(image_data[test_index]))
 		
@@ -243,4 +250,5 @@ func load_labels(labels_file_path, label_count = -1):
 	return new_labels
 
 func _on_new_network_pressed():
-	net = NeuralNetwork.new()
+	net = NeuralNetwork.new(layers, hidden_layer_activation, output_layer_activation, cost)
+	print("New Network Initialized")
