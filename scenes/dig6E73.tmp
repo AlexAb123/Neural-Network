@@ -7,7 +7,7 @@
 shader = ExtResource("2_mjyms")
 shader_parameter/angle = 0.0
 shader_parameter/offset = Vector2(0, 0)
-shader_parameter/noise_strength = 0.0
+shader_parameter/noise_strength = 1.0
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_ujjut")
