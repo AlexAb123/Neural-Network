@@ -49,6 +49,9 @@ func _ready():
 	image_data = load_images(images_file_path, 1000)
 	label_data = load_labels(labels_file_path, 1000)
 	
+	for i in image_data.size():
+		image_data[i] = await apply_noise(image_data[i])
+	
 	training_image_data = image_data.slice(0, snapped(training_split*image_data.size(), batch_size))
 	testing_image_data = image_data.slice(training_image_data.size(), image_data.size())
 	
@@ -61,6 +64,8 @@ func _ready():
 	
 	net = NeuralNetwork.new([784, 16, 16, 10], hidden_layer_activation, output_layer_activation, cost)
 	#net = NeuralNetwork.load_from_file("res://saves/neural_network_save.json")
+	
+	print("Initialization Complete")
 	
 func _on_train_button_pressed():
 	start_training()
@@ -110,21 +115,10 @@ func load_network():
 const SPRITE_0001 = preload("res://sprites/Sprite-0001.png")
 var test_index = 0
 func _on_next_button_pressed():
-	#var d = convert_texture_to_data(SPRITE_0001)
-	#set_texture_on_rect(d)
-	#update_prediction_label(net.forward_propagate(d))
-	#return
-	#set_texture_on_rect(image_data[test_index])
-	#update_prediction_label(net.forward_propagate(image_data[test_index]))
-	if test_index == 0:
-		set_texture_on_rect(image_data[0])
-		texture_rect.texture = convert_data_to_texture(convert_texture_to_data(texture_rect.texture))
+
+	set_texture_on_rect(image_data[test_index])
+	update_prediction_label(net.forward_propagate(image_data[test_index]))
 		
-	else:
-		texture_rect.texture = (await apply_noise(image_data[0]))
-		print(convert_texture_to_data(texture_rect.texture))
-		#texture_rect.texture = convert_data_to_texture(convert_texture_to_data(texture_rect.texture))
-		#set_texture_on_rect(r)
 	test_index += 1
 	if test_index == image_data.size():
 		test_index = 0
@@ -152,9 +146,7 @@ func create_mini_batches(data: Array, batch_size: int):
 	return batches
 
 func convert_texture_to_data(texture: Texture2D):
-	print(texture)
 	var image = texture.get_image()
-	print(image)
 	var data: Array = []
 	for y in 28:
 		for x in 28:
@@ -180,8 +172,7 @@ func apply_noise(pixel_data: Array):
 	input_sprite.material.set_shader_parameter("noise_strength", noise_strength)
 	input_sprite.material.set_shader_parameter("offset", Vector2(randf_range(-3.0/28, 3.0/28), randf_range(-3.0/28, 3.0/28)))
 	await RenderingServer.frame_post_draw
-	#return convert_texture_to_data(sub_viewport.get_texture())
-	return sub_viewport.get_texture()
+	return convert_texture_to_data(sub_viewport.get_texture())
 
 func update_prediction_label(predicted_outputs: Array):
 	prediction_label.clear()
@@ -250,9 +241,6 @@ func load_labels(labels_file_path, label_count = -1):
 		new_labels.append(temp)
 		
 	return new_labels
-
-
-
 
 func _on_new_network_pressed():
 	net = NeuralNetwork.new()
