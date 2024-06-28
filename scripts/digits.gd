@@ -143,6 +143,7 @@ func shuffle_data(image_data: Array, label_data: Array):
 		label_data[i] = label_data[j]
 		label_data[j] = temp_label
 	
+	
 func create_mini_batches(data: Array, batch_size: int):
 	var batches = []
 	for i in range(0, data.size(), batch_size):
