@@ -108,7 +108,7 @@ func update_statistics():
 		training_correct += 1 if is_prediction_correct(net.forward_propagate(training_image_data[i]), training_label_data[i]) else 0
 	training_accuracy_label.text = "Training: " + str(snapped(float(training_correct)/training_image_data.size()*100, 0.1)) + "%"
 	testing_accuracy_label.text = "Testing: " + str(snapped(float(testing_correct)/testing_image_data.size()*100, 0.1)) + "%"
-	print("Total Cost: " + str(net.calculate_average_cost(image_data.slice(0,10), label_data.slice(0,10))))
+	print("Total Cost: " + str(net.calculate_average_cost(image_data.slice(0,1000), label_data.slice(0,1000))))
 	
 	
 func is_prediction_correct(prediction, expected_outputs):
@@ -125,15 +125,11 @@ func save_network():
 		return
 	net.save_to_file("res://saves/neural_network_save.json")
 	print("Saved")
-	var a = []
-	for i in 784:
-		a.append(0.0)
-	set_texture_on_rect(a)
-	update_prediction_label(net.forward_propagate(a))
 	
 func load_network():
 	net = NeuralNetwork.load_from_file("res://saves/neural_network_save1.json")
 	print("Loaded")
+	update_statistics()
 	
 var test_index = 0
 func _on_next_button_pressed():
