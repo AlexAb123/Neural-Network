@@ -29,10 +29,10 @@ var testing_label_data
 
 var image_index = 0
 
-var batch_size: int = 1000
+var batch_size: int = 100
 var learn_rate: float = 0.5
 var epochs: int = 5
-var training_split: float = 0.8
+var training_split: float = 1
 var momentum: int = 0.8
 var hidden_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.SIGMOID)
 var output_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.SOFTMAX)
@@ -42,17 +42,19 @@ var noise_strength: float = 0.0
 
 var net: NeuralNetwork
 
-var layers: Array = [784, 16, 16, 10]
+var layers: Array = [784, 100, 100, 10]
 
 var training_thread: Thread
 
 func _ready():
 	
-	image_data = load_images(images_file_path, 1000)
-	label_data = load_labels(labels_file_path, 1000)
+	label_data = load_labels_ubyte(labels_file_path)
+	image_data = load_from_json("res://data/image_data_noisy.json")
 	
-	for i in image_data.size():
-		image_data[i] = await apply_noise(image_data[i])
+	#image_data = load_images_ubyte(images_file_path)
+	#for i in image_data.size():
+		#image_data[i] = await apply_noise(image_data[i])
+	#save_to_json("res://data/image_data_noisy.json", image_data)
 	
 	training_image_data = image_data.slice(0, snapped(training_split*image_data.size(), batch_size))
 	testing_image_data = image_data.slice(training_image_data.size(), image_data.size())
@@ -82,6 +84,7 @@ func start_training():
 			var end_time = Time.get_ticks_msec()
 			var elapsed_time = end_time - start_time
 			print("Time taken: %d ms" % elapsed_time)
+			save_network()
 			#await get_tree().process_frame
 			#update_statistics(float(i+1)/image_batches.size())
 
@@ -175,7 +178,7 @@ func convert_data_to_texture(pixel_data: Array):
 func apply_noise(pixel_data: Array):
 	var texture = convert_data_to_texture(pixel_data)
 	input_sprite.texture = texture
-	input_sprite.material.set_shader_parameter("angle", deg_to_rad(randf_range(-25, 25)))
+	input_sprite.material.set_shader_parameter("angle", deg_to_rad(randf_range(-20, 20)))
 	input_sprite.material.set_shader_parameter("noise_strength", noise_strength)
 	input_sprite.material.set_shader_parameter("offset", Vector2(randf_range(-3.0/28, 3.0/28), randf_range(-3.0/28, 3.0/28)))
 	await RenderingServer.frame_post_draw
@@ -197,7 +200,7 @@ func update_prediction_label(predicted_outputs: Array):
 func sort_predictions(a, b):
 	return a.y > b.y
 
-func load_images(images_file_path, image_count = -1):
+func load_images_ubyte(images_file_path, image_count = -1):
 	
 	var file = FileAccess.open(images_file_path, FileAccess.READ)
 	
@@ -221,7 +224,7 @@ func load_images(images_file_path, image_count = -1):
 	file.close()
 	return images
 	
-func load_labels(labels_file_path, label_count = -1):
+func load_labels_ubyte(labels_file_path, label_count = -1):
 	
 	var file = FileAccess.open(labels_file_path, FileAccess.READ)
 	
@@ -248,6 +251,19 @@ func load_labels(labels_file_path, label_count = -1):
 		new_labels.append(temp)
 		
 	return new_labels
+
+func save_to_json(file_path: String, data: Array):
+	var file = FileAccess.open(file_path, FileAccess.WRITE)
+	var json = JSON.new()
+	file.store_string(json.stringify(data))
+	file.close()
+
+func load_from_json(file_path: String):
+	var file = FileAccess.open(file_path, FileAccess.READ)
+	var json = JSON.new()
+	var data = json.parse_string(file.get_as_text())
+	file.close()
+	return data
 
 func _on_new_network_pressed():
 	net = NeuralNetwork.new(layers, hidden_layer_activation, output_layer_activation, cost)

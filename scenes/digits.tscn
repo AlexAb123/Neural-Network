@@ -4,7 +4,7 @@
 [ext_resource type="Shader" path="res://shaders/noise.gdshader" id="2_mjyms"]
 [ext_resource type="Texture2D" uid="uid://cfehsbgeschih" path="res://sprites/Sprite-0001.png" id="3_3ip23"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_8peky"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ejifv"]
 shader = ExtResource("2_mjyms")
 shader_parameter/angle = 0.0
 shader_parameter/offset = Vector2(0, 0)
@@ -83,7 +83,7 @@ size = Vector2i(28, 28)
 render_target_update_mode = 3
 
 [node name="InputSprite" type="Sprite2D" parent="SubViewport"]
-material = SubResource("ShaderMaterial_8peky")
+material = SubResource("ShaderMaterial_ejifv")
 texture = ExtResource("3_3ip23")
 centered = false
 
