@@ -29,9 +29,9 @@ var testing_label_data
 
 var image_index = 0
 
-var batch_size: int = 500
-var learn_rate: float = 0.3
-var epochs: int = 1
+var batch_size: int = 100
+var learn_rate: float = 0.5
+var epochs: int = 10
 var training_split: float = 1
 var momentum: int = 0.8
 var hidden_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.SIGMOID)
@@ -46,12 +46,12 @@ var layers: Array = [784, 16, 16, 10]
 
 func _ready():
 	
-	label_data = load_labels_ubyte(labels_file_path, 10000)
+	label_data = load_labels_ubyte(labels_file_path, 1000)
 	#image_data = load_from_json("res://data/image_data_noisy.json")
-	image_data = load_images_ubyte(images_file_path, 10000)
+	image_data = load_images_ubyte(images_file_path, 1000)
 	#for i in image_data.size():
 		#image_data[i] = await apply_noise(image_data[i])
-	#save_to_json("res://data/image_data_noisy.json", image_data)
+	#save_to_json("res://data/image_data_noisy2.json", image_data)
 	
 	#image_data = [[0,0], [0,1], [1,0], [1,1]]
 	#label_data = [[0,1], [1,0], [1,0], [0,1]]
@@ -70,6 +70,8 @@ func _ready():
 	#net = NeuralNetwork.load_from_file("res://saves/neural_network_save.json")
 	print("Initialization Complete")
 	
+func random_float(min: float, max: float) -> float:
+	return min + (max - min) * randi() / pow(2,32)
 func _on_train_button_pressed():
 	if net == null:
 		return
@@ -124,15 +126,14 @@ func save_network():
 	update_prediction_label(net.forward_propagate(a))
 	
 func load_network():
-	net = NeuralNetwork.load_from_file("res://saves/neural_network_save.json")
+	net = NeuralNetwork.load_from_file("res://saves/neural_network_save1.json")
 	print("Loaded")
 	
 var test_index = 0
 func _on_next_button_pressed():
 	if net == null:
 		return
-	print(test_index)
-	print("Total Cost: " + str(net.calculate_average_cost(image_data.slice(0,10), label_data.slice(0,10))))
+	print("Total Cost: " + str(net.calculate_average_cost(image_data.slice(0,100), label_data.slice(0,100))))
 	set_texture_on_rect(image_data[test_index])
 	update_prediction_label(net.forward_propagate(image_data[test_index]))
 	

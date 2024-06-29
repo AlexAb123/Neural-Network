@@ -33,14 +33,14 @@ func _init(_input_count = 0, _output_count = 0, _activation = null):
 		temp_weights = []
 		temp_weight_gradients = []
 		temp_prev_weight_gradients = []
-		biases.append(randf())
+		biases.append(0.0)
 		bias_gradients.append(0.0)
 		prev_bias_gradients.append(0.0)
 		deltas.append(0.0)
 		weighted_sums.append(0.0)
 		outputs.append(0.0)
 		for j in input_count:
-			temp_weights.append(randf())
+			temp_weights.append(randf_range(-1, 1))
 			temp_weight_gradients.append(0.0)
 			temp_prev_weight_gradients.append(0.0)
 		weights.append(temp_weights)
