@@ -29,22 +29,18 @@ func _init(_input_count = 0, _output_count = 0, _activation = null):
 	var temp_weights = []
 	var temp_weight_gradients = []
 	var temp_prev_weight_gradients = []
- 
 	for i in output_count:
 		temp_weights = []
 		temp_weight_gradients = []
 		temp_prev_weight_gradients = []
-		biases.append(0.0)
+		biases.append(randf())
 		bias_gradients.append(0.0)
 		prev_bias_gradients.append(0.0)
 		deltas.append(0.0)
 		weighted_sums.append(0.0)
 		outputs.append(0.0)
 		for j in input_count:
-			var r = randf()
-			if r == 0:
-				print("WEIGHT IS 0")
-			temp_weights.append(r)
+			temp_weights.append(randf())
 			temp_weight_gradients.append(0.0)
 			temp_prev_weight_gradients.append(0.0)
 		weights.append(temp_weights)
