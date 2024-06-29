@@ -49,11 +49,10 @@ var training_thread: Thread
 func _ready():
 	
 	label_data = load_labels_ubyte(labels_file_path)
-	image_data = load_from_json("res://data/image_data_noisy.json")
-	
-	#image_data = load_images_ubyte(images_file_path)
-	#for i in image_data.size():
-		#image_data[i] = await apply_noise(image_data[i])
+	#image_data = load_from_json("res://data/image_data_noisy.json")
+	image_data = load_images_ubyte(images_file_path)
+	for i in image_data.size():
+		image_data[i] = await apply_noise(image_data[i])
 	#save_to_json("res://data/image_data_noisy.json", image_data)
 	
 	training_image_data = image_data.slice(0, snapped(training_split*image_data.size(), batch_size))
