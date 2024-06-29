@@ -45,6 +45,11 @@ var net: NeuralNetwork
 var layers: Array = [784, 16, 16, 10]
 
 func _ready():
+
+		
+	var image: Image = Image.create(28, 28, false, Image.FORMAT_L8)
+	image.fill(Color(0,0,0))
+	texture_rect.texture = ImageTexture.create_from_image(image)
 	
 	label_data = load_labels_ubyte(labels_file_path, 1000)
 	#image_data = load_from_json("res://data/image_data_noisy.json")
@@ -69,6 +74,7 @@ func _ready():
 	net = NeuralNetwork.new(layers, hidden_layer_activation, output_layer_activation, cost)
 	#net = NeuralNetwork.load_from_file("res://saves/neural_network_save.json")
 	print("Initialization Complete")
+
 	
 func random_float(min: float, max: float) -> float:
 	return min + (max - min) * randi() / pow(2,32)
@@ -140,6 +146,37 @@ func _on_next_button_pressed():
 	test_index += 1
 	if test_index == image_data.size():
 		test_index = 0
+
+func _input(event):
+	if Input.is_action_pressed("left_click"):
+		var pos = event.global_position - texture_rect.global_position
+		pos.x = pos.x/texture_rect.size.x*28
+		pos.y = pos.y/texture_rect.size.y*28
+		if pos.x >= 0 and pos.x <= 27 and pos.y >= 0 and pos.y <= 27:
+			pos.x = int(pos.x)
+			pos.y = int(pos.y)
+			var image: Image = texture_rect.texture.get_image()
+			for x in range(-1,2,1):
+				for y in range(-1,2,1):
+					var v = 0.0
+					if x != 0 and y != 0:
+						v = 0.4
+					elif x == 0 and y == 0:
+						v = 0.97
+					else:
+						v = 0.7
+					var color = Color(v,v,v)
+					if image.get_pixel(pos.x+x, pos.y+y).get_luminance() < color.get_luminance():
+						image.set_pixel(pos.x+x, pos.y+y, color)
+			texture_rect.texture = ImageTexture.create_from_image(image)
+			read_texture_and_update_label()
+	elif Input.is_action_just_pressed("right_click"):
+		var image: Image = texture_rect.texture.get_image()
+		image.fill(Color(0,0,0))
+		texture_rect.texture = ImageTexture.create_from_image(image)
+		read_texture_and_update_label()
+func read_texture_and_update_label():
+	update_prediction_label(net.forward_propagate(convert_texture_to_data(texture_rect.texture)))
 
 func set_texture_on_rect(data_point: Array):
 	texture_rect.texture = convert_data_to_texture(data_point)
