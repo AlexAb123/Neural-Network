@@ -37,7 +37,7 @@ func _ready():
 			else:
 				labels.append([0,1])
 	shuffle_data(data, labels)
-	net = NeuralNetwork.new(2, 2, 3, 1, hidden_layer_activation, output_layer_activation, cost)
+	net = NeuralNetwork.new([2, 2, 3, 1], hidden_layer_activation, output_layer_activation, cost)
 	update_boxes()
 	data_batches = create_mini_batches(data, 50)
 	label_batches = create_mini_batches(labels, 50)
@@ -110,7 +110,7 @@ func _process(delta):
 	if start:
 		frame += 1
 		for i in data_batches.size():
-			net.train(data_batches[i], label_batches[i], 0.5, 10, 0.8)
+			net.train(data_batches[i], label_batches[i], 0.5, 0.8)
 			net.save_to_file("res://saves/neural_network_save.json")
 			update_boxes()
 		if frame == 1:

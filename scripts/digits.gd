@@ -30,9 +30,9 @@ var testing_label_data
 var image_index = 0
 
 var batch_size: int = 100
-var learn_rate: float = 0.5
-var epochs: int = 5
-var training_split: float = 1
+var learn_rate: float = 0.3
+var epochs: int = 1
+var training_split: float = 0.8
 var momentum: int = 0.8
 var hidden_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.SIGMOID)
 var output_layer_activation = ActivationFactory.new_activation(ActivationFactory.type.SOFTMAX)
@@ -42,18 +42,19 @@ var noise_strength: float = 0.0
 
 var net: NeuralNetwork
 
-var layers: Array = [784, 100, 100, 10]
-
-var training_thread: Thread
+var layers: Array = [784, 16, 16, 10]
 
 func _ready():
 	
-	label_data = load_labels_ubyte(labels_file_path)
+	label_data = load_labels_ubyte(labels_file_path, 10000)
 	#image_data = load_from_json("res://data/image_data_noisy.json")
-	image_data = load_images_ubyte(images_file_path)
-	for i in image_data.size():
-		image_data[i] = await apply_noise(image_data[i])
+	image_data = load_images_ubyte(images_file_path, 10000)
+	#for i in image_data.size():
+		#image_data[i] = await apply_noise(image_data[i])
 	#save_to_json("res://data/image_data_noisy.json", image_data)
+	
+	#image_data = [[0,0], [0,1], [1,0], [1,1]]
+	#label_data = [[0,1], [1,0], [1,0], [0,1]]
 	
 	training_image_data = image_data.slice(0, snapped(training_split*image_data.size(), batch_size))
 	testing_image_data = image_data.slice(training_image_data.size(), image_data.size())
@@ -67,14 +68,13 @@ func _ready():
 	
 	net = NeuralNetwork.new(layers, hidden_layer_activation, output_layer_activation, cost)
 	#net = NeuralNetwork.load_from_file("res://saves/neural_network_save.json")
-	
 	print("Initialization Complete")
 	
 func _on_train_button_pressed():
 	if net == null:
 		return
 	start_training()
-
+	
 func start_training():
 	for epoch in epochs:
 		for i in image_batches.size():
@@ -83,22 +83,24 @@ func start_training():
 			var end_time = Time.get_ticks_msec()
 			var elapsed_time = end_time - start_time
 			print("Time taken: %d ms" % elapsed_time)
+			epoch_completion_label.text = "Epoch: " + str(snapped(float(i+1)/image_batches.size()*100, 0.1)) + "%"
+			print(epoch_completion_label.text)
+			
 			save_network()
 			#await get_tree().process_frame
-			#update_statistics(float(i+1)/image_batches.size())
+			#update_statistics()
 
-func update_statistics(epoch_completion: float):
-	epoch_completion_label.text = "Epoch: " + str(snapped(epoch_completion*100, 0.1)) + "%"
+func update_statistics():
 	
 	var testing_correct := 0
 	var training_correct := 0
 	for i in testing_image_data.size():
 		testing_correct += 1 if is_prediction_correct(net.forward_propagate(testing_image_data[i]), testing_label_data[i]) else 0
-	#for i in training_image_data.size():
-		#training_correct += 1 if is_prediction_correct(net.forward_propagate(training_image_data[i]), training_label_data[i]) else 0
-	#training_accuracy_label.text = "Training: " + str(snapped(float(training_correct)/training_image_data.size()*100, 0.1)) + "%"
+	for i in training_image_data.size():
+		training_correct += 1 if is_prediction_correct(net.forward_propagate(training_image_data[i]), training_label_data[i]) else 0
+	training_accuracy_label.text = "Training: " + str(snapped(float(training_correct)/training_image_data.size()*100, 0.1)) + "%"
 	testing_accuracy_label.text = "Testing: " + str(snapped(float(testing_correct)/testing_image_data.size()*100, 0.1)) + "%"
-	#print("Total Cost: " + str(net.calculate_average_cost(image_data, label_data)))
+	print("Total Cost: " + str(net.calculate_average_cost(image_data, label_data)))
 	
 	
 func is_prediction_correct(prediction, expected_outputs):
@@ -117,17 +119,17 @@ func save_network():
 	print("Saved")
 
 func load_network():
-	net = NeuralNetwork.load_from_file("res://saves/neural_network_save.json")
+	net = NeuralNetwork.load_from_file("res://saves/neural_network_savew.json")
 	print("Loaded")
-
-const SPRITE_0001 = preload("res://sprites/Sprite-0001.png")
+	
 var test_index = 0
 func _on_next_button_pressed():
 	if net == null:
 		return
+	print(test_index)
+	#print("Total Cost: " + str(net.calculate_average_cost(image_data, label_data)))
 	set_texture_on_rect(image_data[test_index])
 	update_prediction_label(net.forward_propagate(image_data[test_index]))
-		
 	test_index += 1
 	if test_index == image_data.size():
 		test_index = 0
@@ -189,7 +191,6 @@ func update_prediction_label(predicted_outputs: Array):
 	for i in predicted_outputs.size():
 		predicted_outputs_with_label.append(Vector2(i, predicted_outputs[i]))
 	predicted_outputs_with_label.sort_custom(sort_predictions)
-	
 	for i in predicted_outputs_with_label.size():
 		if i == 0:
 			prediction_label.append_text("[b]" + str(predicted_outputs_with_label[i].x) + ": " + str(snapped(100*predicted_outputs_with_label[i].y, 0.01))  + "%[/b]\n\n")

@@ -41,7 +41,10 @@ func _init(_input_count = 0, _output_count = 0, _activation = null):
 		weighted_sums.append(0.0)
 		outputs.append(0.0)
 		for j in input_count:
-			temp_weights.append(randf())
+			var r = randf()
+			if r == 0:
+				print("WEIGHT IS 0")
+			temp_weights.append(r)
 			temp_weight_gradients.append(0.0)
 			temp_prev_weight_gradients.append(0.0)
 		weights.append(temp_weights)

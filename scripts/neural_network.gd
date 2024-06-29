@@ -7,11 +7,9 @@ var layers: Array[Layer] = []
 var cost: Cost
 
 func _init(layer_sizes: Array = [], hidden_layer_activation = null, output_layer_activation = null, _cost = null):
-	
 	cost = _cost
-
 	for i in range(1, layer_sizes.size()):
-		var a = hidden_layer_activation if i < layer_sizes.size() - 1 else output_layer_activation
+		var a: Activation = hidden_layer_activation if i < layer_sizes.size() - 1 else output_layer_activation
 		layers.append(Layer.new(layer_sizes[i-1], layer_sizes[i], a))
 
 func forward_propagate(data_point: Array):
