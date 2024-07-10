@@ -90,6 +90,6 @@ centered = false
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/VBoxContainer2/New Network" to="." method="_on_new_network_pressed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/VBoxContainer2/SaveButton" to="." method="save_network"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/VBoxContainer2/LoadButton" to="." method="load_network"]
-[connection signal="pressed" from="CanvasLayer/HBoxContainer/NextButton" to="." method="_on_next_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/NextButton" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/HBoxContainer/NextButton" to="." method="_on_next_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/TrainButton" to="." method="_on_train_button_pressed"]
