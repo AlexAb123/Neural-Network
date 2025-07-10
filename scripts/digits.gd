@@ -233,9 +233,9 @@ func update_prediction_label(predicted_outputs: Array):
 	predicted_outputs_with_label.sort_custom(sort_predictions)
 	for i in predicted_outputs_with_label.size():
 		if i == 0:
-			prediction_label.append_text("[b]" + str(predicted_outputs_with_label[i].x) + ": " + str(snapped(100*predicted_outputs_with_label[i].y, 0.01))  + "%[/b]\n\n")
+			prediction_label.append_text("[b]" + str(int(predicted_outputs_with_label[i].x)) + ": " + str(snapped(100*predicted_outputs_with_label[i].y, 0.01))  + "%[/b]\n\n")
 		else:
-			prediction_label.append_text(str(predicted_outputs_with_label[i].x) + ": " + str(snapped(100*predicted_outputs_with_label[i].y, 0.01)) + "%\n\n")
+			prediction_label.append_text(str(int(predicted_outputs_with_label[i].x)) + ": " + str(snapped(100*predicted_outputs_with_label[i].y, 0.01)) + "%\n\n")
 			
 func sort_predictions(a, b):
 	return a.y > b.y
