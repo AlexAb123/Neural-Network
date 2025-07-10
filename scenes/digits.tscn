@@ -1,8 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://bpo5hd43mpuj8"]
+[gd_scene load_steps=4 format=3 uid="uid://bpo5hd43mpuj8"]
 
-[ext_resource type="Script" path="res://scripts/digits.gd" id="1_ujjut"]
-[ext_resource type="Shader" path="res://shaders/noise.gdshader" id="2_mjyms"]
-[ext_resource type="Texture2D" uid="uid://cfehsbgeschih" path="res://sprites/Sprite-0001.png" id="3_3ip23"]
+[ext_resource type="Script" uid="uid://cb3dmng6wd10d" path="res://scripts/digits.gd" id="1_ujjut"]
+[ext_resource type="Shader" uid="uid://qun5lb33mh4n" path="res://shaders/noise.gdshader" id="2_mjyms"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ejifv"]
 shader = ExtResource("2_mjyms")
@@ -84,7 +83,6 @@ render_target_update_mode = 3
 
 [node name="InputSprite" type="Sprite2D" parent="SubViewport"]
 material = SubResource("ShaderMaterial_ejifv")
-texture = ExtResource("3_3ip23")
 centered = false
 
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/VBoxContainer2/New Network" to="." method="_on_new_network_pressed"]

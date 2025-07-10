@@ -87,5 +87,3 @@ func _to_string():
 	for i in layers.size():
 		string += "Layer " + str(i) + ":\n" + str(layers[i]) + "\n----------------------------------------------\n"
 	return string
-
-
